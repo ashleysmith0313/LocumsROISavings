@@ -34,7 +34,7 @@ if uploaded_file:
     with st.sidebar.expander("📌 Permanent Staffing Inputs"):
         st.markdown("**These inputs control the onboarding rate and average shifts per provider for permanent staff.**")
         for item in editable_values:
-            if 'Provider' in item['description'] or 'Days per provider' in item['description']:
+            if 'Providers Onboarded' in item['description'] or 'Average Days per provider per Month (B22)' in f"{item['description']} ({item['cell']})":
                 label = f"{item['description']} ({item['cell']})"
                 input_values[label] = st.slider(
                     label,
@@ -45,20 +45,20 @@ if uploaded_file:
                 )
 
     with st.sidebar.expander("📌 Float Pool Inputs"):
-        st.markdown("**These inputs impact Float Pool deployment and cost control.**")
+        st.markdown("**These inputs impact Float Pool deployment, shifts, and cost control.**")
         for item in editable_values:
-            if 'Open Days per Month (C17)' in f"{item['description']} ({item['cell']})" or 'Float' in item['description']:
+            if 'Open Days per Month (C17)' in f"{item['description']} ({item['cell']})" or 'Average Days per provider per Month (B27)' in f"{item['description']} ({item['cell']})":
                 label = f"{item['description']} ({item['cell']})"
                 input_values[label] = st.slider(
                     label,
                     min_value=0,
                     max_value=int(item['value'] * 2),
                     value=int(item['value']),
-                    help="Drives Float Pool shift allocation and impacts cost model."
+                    help="Impacts Float Pool shift allocation and impacts cost model."
                 )
 
     with st.sidebar.expander("📌 VISTA Locums Inputs"):
-        st.markdown("**These inputs affect Locum usage assumptions and related costs.**")
+        st.markdown("**These inputs affect Locum usage assumptions, shifts, and related costs.**")
         for item in editable_values:
             if 'Open Days per Month (D17)' in f"{item['description']} ({item['cell']})" or 'Hospitalist' in item['description']:
                 label = f"{item['description']} ({item['cell']})"
@@ -72,15 +72,18 @@ if uploaded_file:
 
     months = list(range(1, 25))
 
-    permanent_rate = input_values.get('Providers Onboarded per Month (B21)', 0) * input_values.get('Average Days per provider per Month (B22)', 0)
-    float_pool_days = input_values.get('Open Days per Month (C17)', 0)
-    vista_days = input_values.get('Open Days per Month (D17)', 0)
+    # Rates with separate controls
+    permanent_onboard_rate = input_values.get('Providers Onboarded per Month (B21)', 0)
+    permanent_days_per_provider = input_values.get('Average Days per provider per Month (B22)', 0)
+    float_pool_open_days = input_values.get('Open Days per Month (C17)', 0)
+    float_pool_days_per_provider = input_values.get('Average Days per provider per Month (B27)', 0)
+    locum_open_days = input_values.get('Open Days per Month (D17)', 0)
     hospitalist_rate = input_values.get('Hospitalist (B4)', 0)
 
     shifts_data = {
-        'Permanent': [permanent_rate * month for month in months],
-        'Float Pool': [float_pool_days * month for month in months],
-        'VISTA Locums': [vista_days * month for month in months]
+        'Permanent': [permanent_onboard_rate * permanent_days_per_provider * month for month in months],
+        'Float Pool': [float_pool_open_days * float_pool_days_per_provider * month for month in months],
+        'VISTA Locums': [locum_open_days * hospitalist_rate * month for month in months]
     }
 
     baseline_cost = 500000
