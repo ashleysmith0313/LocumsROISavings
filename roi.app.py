@@ -32,7 +32,7 @@ if uploaded_file:
     input_values = {}
 
     with st.sidebar.expander("📌 Permanent Staffing Inputs"):
-        st.markdown("**These inputs control the onboarding rate and average shifts per provider for permanent staff.**")
+        st.markdown("**Permanent staffing ramp-up assumptions.**")
         for item in editable_values:
             if 'Providers Onboarded' in item['description'] or 'Average Days per provider per Month (B22)' in f"{item['description']} ({item['cell']})":
                 label = f"{item['description']} ({item['cell']})"
@@ -40,12 +40,11 @@ if uploaded_file:
                     label,
                     min_value=0,
                     max_value=int(item['value'] * 2),
-                    value=int(item['value']),
-                    help="Adjusts permanent provider staffing growth and shift impact."
+                    value=int(item['value'])
                 )
 
     with st.sidebar.expander("📌 Float Pool Inputs"):
-        st.markdown("**These inputs impact Float Pool deployment, shifts, and cost control.**")
+        st.markdown("**Float Pool deployment assumptions.**")
         for item in editable_values:
             if 'Open Days per Month (C17)' in f"{item['description']} ({item['cell']})" or 'Average Days per provider per Month (B27)' in f"{item['description']} ({item['cell']})":
                 label = f"{item['description']} ({item['cell']})"
@@ -53,12 +52,11 @@ if uploaded_file:
                     label,
                     min_value=0,
                     max_value=int(item['value'] * 2),
-                    value=int(item['value']),
-                    help="Impacts Float Pool shift allocation and impacts cost model."
+                    value=int(item['value'])
                 )
 
     with st.sidebar.expander("📌 VISTA Locums Inputs"):
-        st.markdown("**These inputs affect Locum usage assumptions, shifts, and related costs.**")
+        st.markdown("**Locums usage assumptions.**")
         for item in editable_values:
             if 'Open Days per Month (D17)' in f"{item['description']} ({item['cell']})" or 'Hospitalist' in item['description']:
                 label = f"{item['description']} ({item['cell']})"
@@ -66,13 +64,11 @@ if uploaded_file:
                     label,
                     min_value=0,
                     max_value=int(item['value'] * 2),
-                    value=int(item['value']),
-                    help="Controls Locum staffing volume and cost impact."
+                    value=int(item['value'])
                 )
 
     months = list(range(1, 25))
 
-    # Rates with separate controls
     permanent_onboard_rate = input_values.get('Providers Onboarded per Month (B21)', 0)
     permanent_days_per_provider = input_values.get('Average Days per provider per Month (B22)', 0)
     float_pool_open_days = input_values.get('Open Days per Month (C17)', 0)
@@ -80,18 +76,37 @@ if uploaded_file:
     locum_open_days = input_values.get('Open Days per Month (D17)', 0)
     hospitalist_rate = input_values.get('Hospitalist (B4)', 0)
 
+    permanent_shifts = []
+    total_permanent = 0
+    for month in months:
+        if month >= 4:
+            total_permanent += permanent_onboard_rate
+        permanent_shifts.append(total_permanent * permanent_days_per_provider)
+
+    float_pool_shifts = []
+    for month in months:
+        if month >= 12:
+            float_pool_shifts.append(float_pool_open_days * float_pool_days_per_provider)
+        else:
+            float_pool_shifts.append(0)
+
+    locum_shifts = []
+    for month in months:
+        if month < 12:
+            locum_shifts.append(locum_open_days)
+        else:
+            locum_shifts.append(max(locum_open_days - (month - 11) * 5, 0))
+
     shifts_data = {
-        'Permanent': [permanent_onboard_rate * permanent_days_per_provider * month for month in months],
-        'Float Pool': [float_pool_open_days * float_pool_days_per_provider * month for month in months],
-        'VISTA Locums': [locum_open_days * hospitalist_rate * month for month in months]
+        'Permanent': permanent_shifts,
+        'Float Pool': float_pool_shifts,
+        'VISTA Locums': locum_shifts
     }
 
-    baseline_cost = 500000
-
     cost_data = {
-        'Permanent': [baseline_cost - shifts_data['Permanent'][month - 1] * 100 for month in months],
-        'Float Pool': [baseline_cost - shifts_data['Float Pool'][month - 1] * 80 for month in months],
-        'VISTA Locums': [baseline_cost - shifts_data['VISTA Locums'][month - 1] * hospitalist_rate for month in months]
+        'Permanent': [shifts * 100 for shifts in permanent_shifts],
+        'Float Pool': [shifts * 80 for shifts in float_pool_shifts],
+        'VISTA Locums': [shifts * hospitalist_rate for shifts in locum_shifts]
     }
 
     st.subheader("📈 Shift Coverage Over 24 Months")
@@ -105,10 +120,9 @@ if uploaded_file:
     fig2 = go.Figure()
     for cat in ['Permanent', 'Float Pool', 'VISTA Locums']:
         fig2.add_trace(go.Bar(x=months, y=cost_data[cat], name=cat, hovertemplate=f"%{{x}} Month<br>$%{{y:,.0f}} Cost"))
-
     fig2.update_layout(barmode='stack', xaxis_title="Month", yaxis_title="Cost ($)")
     st.plotly_chart(fig2, use_container_width=True)
 
-    st.success("✅ Graphs updated with current editable inputs.")
+    st.success("✅ Graphs updated with ramp logic and onboarding assumptions.")
 else:
     st.info("Please upload an Excel file to get started.")
