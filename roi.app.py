@@ -26,19 +26,19 @@ if uploaded_file:
                                 description = prev_cell.value.strip()
                                 break
                         if description:
-                            editable_values.append({'description': description, 'value': cell.value})
+                            editable_values.append({'description': description, 'value': cell.value, 'cell': cell.coordinate})
 
     st.sidebar.header("🔧 Adjust Model Inputs")
     input_values = {}
     for item in editable_values:
-        label = f"{item['description']}"
+        label = f"{item['description']} ({item['cell']})"
         input_values[label] = st.sidebar.slider(label, min_value=0, max_value=int(item['value'] * 2), value=int(item['value']))
 
     months = list(range(1, 25))
 
-    permanent_rate = input_values.get('Providers Onboarded per Month', 0) * input_values.get('Average Days per provider per Month', 0)
-    float_pool_rate = input_values.get('Average Days per provider per Month', 0) * input_values.get('Target Max Providers', 0)
-    vista_rate = input_values.get('Hospitalist', 0) / 100  # example adjustment
+    permanent_rate = input_values.get('Providers Onboarded per Month (B21)', 0) * input_values.get('Average Days per provider per Month (B22)', 0)
+    float_pool_rate = input_values.get('Average Days per provider per Month (B27)', 0) * input_values.get('Target Max Providers (B23)', 0)
+    vista_rate = input_values.get('Hospitalist (B4)', 0) / 100
 
     shifts_data = {
         'Permanent': [permanent_rate * month for month in months],
@@ -46,7 +46,7 @@ if uploaded_file:
         'VISTA Locums': [vista_rate * month for month in months]
     }
 
-    baseline_cost = 500000  # Example baseline
+    baseline_cost = 500000
 
     cost_data = {
         'Permanent': [baseline_cost - shifts_data['Permanent'][month - 1] * 100 for month in months],
