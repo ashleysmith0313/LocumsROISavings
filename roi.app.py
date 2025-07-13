@@ -34,7 +34,7 @@ if uploaded_file:
     with st.sidebar.expander("📌 Permanent Staffing Inputs"):
         st.markdown("**Permanent staffing ramp-up assumptions.**")
         for item in editable_values:
-            if 'Providers Onboarded per Month (B21)' in f"{item['description']} ({item['cell']})" or 'Average Days per provider per Month (B22)' in f"{item['description']} ({item['cell']})":
+            if item['cell'] in ['B21', 'B22']:
                 label = f"{item['description']} ({item['cell']})"
                 input_values[label] = st.slider(
                     label,
@@ -46,7 +46,7 @@ if uploaded_file:
     with st.sidebar.expander("📌 Float Pool Inputs"):
         st.markdown("**Float Pool deployment assumptions.**")
         for item in editable_values:
-            if 'Open Days per Month (C17)' in f"{item['description']} ({item['cell']})" or 'Average Days per provider per Month (B27)' in f"{item['description']} ({item['cell']})" or 'Providers Onboarded per Month (B26)' in f"{item['description']} ({item['cell']})":
+            if item['cell'] in ['C17', 'B27', 'B26']:
                 label = f"{item['description']} ({item['cell']})"
                 input_values[label] = st.slider(
                     label,
@@ -58,7 +58,7 @@ if uploaded_file:
     with st.sidebar.expander("📌 VISTA Locums Inputs"):
         st.markdown("**Locums usage assumptions.**")
         for item in editable_values:
-            if 'Open Days per Month (D17)' in f"{item['description']} ({item['cell']})" or 'Hospitalist' in item['description']:
+            if item['cell'] in ['D17', 'B4']:
                 label = f"{item['description']} ({item['cell']})"
                 input_values[label] = st.slider(
                     label,
@@ -126,6 +126,6 @@ if uploaded_file:
     fig2.update_layout(barmode='stack', xaxis_title="Month", yaxis_title="Cost ($)")
     st.plotly_chart(fig2, use_container_width=True)
 
-    st.success("✅ Graphs updated with ramp logic, corrected grouping, and realistic locum start assumptions.")
+    st.success("✅ Graphs updated with cleaned slider groups and accurate logic.")
 else:
     st.info("Please upload an Excel file to get started.")
