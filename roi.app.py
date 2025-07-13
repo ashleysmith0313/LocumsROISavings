@@ -34,7 +34,7 @@ if uploaded_file:
     with st.sidebar.expander("📌 Permanent Staffing Inputs"):
         st.markdown("**Permanent staffing ramp-up assumptions.**")
         for item in editable_values:
-            if 'Providers Onboarded' in item['description'] or 'Average Days per provider per Month (B22)' in f"{item['description']} ({item['cell']})":
+            if 'Providers Onboarded per Month (B21)' in f"{item['description']} ({item['cell']})" or 'Average Days per provider per Month (B22)' in f"{item['description']} ({item['cell']})":
                 label = f"{item['description']} ({item['cell']})"
                 input_values[label] = st.slider(
                     label,
@@ -46,7 +46,7 @@ if uploaded_file:
     with st.sidebar.expander("📌 Float Pool Inputs"):
         st.markdown("**Float Pool deployment assumptions.**")
         for item in editable_values:
-            if 'Open Days per Month (C17)' in f"{item['description']} ({item['cell']})" or 'Average Days per provider per Month (B27)' in f"{item['description']} ({item['cell']})":
+            if 'Open Days per Month (C17)' in f"{item['description']} ({item['cell']})" or 'Average Days per provider per Month (B27)' in f"{item['description']} ({item['cell']})" or 'Providers Onboarded per Month (B26)' in f"{item['description']} ({item['cell']})":
                 label = f"{item['description']} ({item['cell']})"
                 input_values[label] = st.slider(
                     label,
@@ -71,6 +71,7 @@ if uploaded_file:
 
     permanent_onboard_rate = input_values.get('Providers Onboarded per Month (B21)', 0)
     permanent_days_per_provider = input_values.get('Average Days per provider per Month (B22)', 0)
+    float_pool_onboard_rate = input_values.get('Providers Onboarded per Month (B26)', 0)
     float_pool_open_days = input_values.get('Open Days per Month (C17)', 0)
     float_pool_days_per_provider = input_values.get('Average Days per provider per Month (B27)', 0)
     locum_open_days = input_values.get('Open Days per Month (D17)', 0)
@@ -84,18 +85,20 @@ if uploaded_file:
         permanent_shifts.append(total_permanent * permanent_days_per_provider)
 
     float_pool_shifts = []
+    total_float_pool = 0
     for month in months:
         if month >= 12:
-            float_pool_shifts.append(float_pool_open_days * float_pool_days_per_provider)
+            total_float_pool += float_pool_onboard_rate
+            float_pool_shifts.append(total_float_pool * float_pool_days_per_provider)
         else:
             float_pool_shifts.append(0)
 
     locum_shifts = []
     for month in months:
-        if month < 12:
+        if month >= 4:
             locum_shifts.append(locum_open_days)
         else:
-            locum_shifts.append(max(locum_open_days - (month - 11) * 5, 0))
+            locum_shifts.append(0)
 
     shifts_data = {
         'Permanent': permanent_shifts,
@@ -123,6 +126,6 @@ if uploaded_file:
     fig2.update_layout(barmode='stack', xaxis_title="Month", yaxis_title="Cost ($)")
     st.plotly_chart(fig2, use_container_width=True)
 
-    st.success("✅ Graphs updated with ramp logic and onboarding assumptions.")
+    st.success("✅ Graphs updated with ramp logic, corrected grouping, and realistic locum start assumptions.")
 else:
     st.info("Please upload an Excel file to get started.")
