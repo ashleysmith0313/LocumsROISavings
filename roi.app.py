@@ -67,10 +67,10 @@ if uploaded_file:
                     value=int(item['value'])
                 )
         locum_days_per_provider = st.slider(
-            "Average Days per Locum per Month (Custom Input)",
+            "Average Days per Locum per Month (Manual Entry)",
             min_value=0,
-            max_value=60,
-            value=10
+            max_value=240,
+            value=20
         )
         input_values["Average Days per Locum per Month"] = locum_days_per_provider
 
@@ -134,6 +134,6 @@ if uploaded_file:
     fig2.update_layout(barmode='stack', xaxis_title="Month", yaxis_title="Cost ($)")
     st.plotly_chart(fig2, use_container_width=True)
 
-    st.success("✅ Graphs updated with Locum days per provider logic included.")
+    st.success("✅ Graphs updated with Locum days per provider slider correctly included.")
 else:
     st.info("Please upload an Excel file to get started.")
