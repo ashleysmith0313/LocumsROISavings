@@ -1,9 +1,7 @@
-
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from openpyxl import load_workbook
-from io import BytesIO
 
 st.set_page_config(page_title="Commonwealth Cares Deployment Model", layout="wide")
 
@@ -36,17 +34,19 @@ if uploaded_file:
         label = f"{item['description']}"
         input_values[label] = st.sidebar.slider(label, min_value=0, max_value=int(item['value'] * 2), value=int(item['value']))
 
-    # Simulated data - replace with your real logic
     months = list(range(1, 25))
-    categories = ['Permanent', 'Float Pool', 'VISTA Locums']
+
+    permanent_rate = input_values.get('Providers Onboarded per Month', 0) * input_values.get('Average Days per provider per Month', 0)
+    float_pool_rate = input_values.get('Average Days per provider per Month', 0) * input_values.get('Target Max Providers', 0)
+    vista_rate = input_values.get('Hospitalist', 0) / 100  # example adjustment
 
     shifts_data = {
-        'Permanent': [input_values.get('Providers Onboarded per Month', 0) * month for month in months],
-        'Float Pool': [input_values.get('Average Days per provider per Month', 0) * month for month in months],
-        'VISTA Locums': [input_values.get('Hospitalist', 0) * month for month in months]
+        'Permanent': [permanent_rate * month for month in months],
+        'Float Pool': [float_pool_rate * month for month in months],
+        'VISTA Locums': [vista_rate * month for month in months]
     }
 
-    baseline_cost = 500000  # Example baseline for savings calculation
+    baseline_cost = 500000  # Example baseline
 
     cost_data = {
         'Permanent': [baseline_cost - shifts_data['Permanent'][month - 1] * 100 for month in months],
@@ -56,7 +56,7 @@ if uploaded_file:
 
     st.subheader("📈 Shift Coverage Over 24 Months")
     fig1 = go.Figure()
-    for cat in categories:
+    for cat in ['Permanent', 'Float Pool', 'VISTA Locums']:
         fig1.add_trace(go.Bar(x=months, y=shifts_data[cat], name=cat))
     fig1.update_layout(barmode='stack', xaxis_title="Month", yaxis_title="Shifts")
 
@@ -64,12 +64,11 @@ if uploaded_file:
 
     st.subheader("💰 Staffing Costs & Savings Over 24 Months")
     fig2 = go.Figure()
-    for cat in categories:
+    for cat in ['Permanent', 'Float Pool', 'VISTA Locums']:
         fig2.add_trace(go.Bar(x=months, y=cost_data[cat], name=cat))
 
-    # Adding savings annotation per month (example with baseline - stacked total)
     for month in months:
-        total_cost = sum(cost_data[cat][month - 1] for cat in categories)
+        total_cost = sum(cost_data[cat][month - 1] for cat in ['Permanent', 'Float Pool', 'VISTA Locums'])
         savings = baseline_cost - total_cost
         fig2.add_annotation(x=month, y=0, text=f"Save: ${savings:,.0f}", showarrow=False, yshift=-15, font=dict(size=10))
 
