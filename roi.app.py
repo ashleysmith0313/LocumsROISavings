@@ -120,6 +120,16 @@ if uploaded_file:
         'VISTA Locums': [shifts * hospitalist_rate for shifts in locum_shifts]
     }
 
+    total_cost_per_month = [
+        cost_data['Permanent'][i] + cost_data['Float Pool'][i] + cost_data['VISTA Locums'][i]
+        for i in range(len(months))
+    ]
+
+    baseline_monthly_cost = 500000  # Example baseline monthly cost for comparison
+    total_baseline_cost = baseline_monthly_cost * len(months)
+    total_actual_cost = sum(total_cost_per_month)
+    total_savings = total_baseline_cost - total_actual_cost
+
     st.subheader("📈 Shift Coverage Over 24 Months")
     fig1 = go.Figure()
     for cat in ['Permanent', 'Float Pool', 'VISTA Locums']:
@@ -131,9 +141,12 @@ if uploaded_file:
     fig2 = go.Figure()
     for cat in ['Permanent', 'Float Pool', 'VISTA Locums']:
         fig2.add_trace(go.Bar(x=months, y=cost_data[cat], name=cat, hovertemplate=f"%{{x}} Month<br>$%{{y:,.0f}} Cost"))
+    fig2.add_trace(go.Scatter(x=months, y=total_cost_per_month, mode='lines+markers', name='Total Monthly Cost', line=dict(color='black', dash='dot')))
     fig2.update_layout(barmode='stack', xaxis_title="Month", yaxis_title="Cost ($)")
     st.plotly_chart(fig2, use_container_width=True)
 
-    st.success("✅ Graphs updated with Locum days per provider slider correctly included.")
+    st.info(f"💰 **Total Cost Over 24 Months:** ${total_actual_cost:,.0f}")
+    st.success(f"🎯 **Total Savings vs Baseline:** ${total_savings:,.0f}")
+
 else:
     st.info("Please upload an Excel file to get started.")
