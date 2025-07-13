@@ -39,7 +39,7 @@ if uploaded_file:
                 input_values[label] = st.slider(
                     label,
                     min_value=0,
-                    max_value=int(item['value'] * 2),
+                    max_value=int(item['value'] * 4),
                     value=int(item['value'])
                 )
 
@@ -51,7 +51,7 @@ if uploaded_file:
                 input_values[label] = st.slider(
                     label,
                     min_value=0,
-                    max_value=int(item['value'] * 2),
+                    max_value=int(item['value'] * 4),
                     value=int(item['value'])
                 )
 
@@ -63,7 +63,7 @@ if uploaded_file:
                 input_values[label] = st.slider(
                     label,
                     min_value=0,
-                    max_value=int(item['value'] * 2),
+                    max_value=int(item['value'] * 4),
                     value=int(item['value'])
                 )
 
@@ -126,6 +126,6 @@ if uploaded_file:
     fig2.update_layout(barmode='stack', xaxis_title="Month", yaxis_title="Cost ($)")
     st.plotly_chart(fig2, use_container_width=True)
 
-    st.success("✅ Graphs updated with cleaned slider groups and accurate logic.")
+    st.success("✅ Graphs updated with cleaned slider groups, extended ranges, and accurate logic.")
 else:
     st.info("Please upload an Excel file to get started.")
