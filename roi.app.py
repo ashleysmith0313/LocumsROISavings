@@ -66,6 +66,13 @@ if uploaded_file:
                     max_value=int(item['value'] * 4),
                     value=int(item['value'])
                 )
+        locum_days_per_provider = st.slider(
+            "Average Days per Locum per Month (Custom Input)",
+            min_value=0,
+            max_value=60,
+            value=10
+        )
+        input_values["Average Days per Locum per Month"] = locum_days_per_provider
 
     months = list(range(1, 25))
 
@@ -76,6 +83,7 @@ if uploaded_file:
     float_pool_days_per_provider = input_values.get('Average Days per provider per Month (B27)', 0)
     locum_open_days = input_values.get('Open Days per Month (D17)', 0)
     hospitalist_rate = input_values.get('Hospitalist (B4)', 0)
+    locum_days_per_provider = input_values.get('Average Days per Locum per Month', 0)
 
     permanent_shifts = []
     total_permanent = 0
@@ -96,7 +104,7 @@ if uploaded_file:
     locum_shifts = []
     for month in months:
         if month >= 4:
-            locum_shifts.append(locum_open_days)
+            locum_shifts.append(locum_open_days * locum_days_per_provider)
         else:
             locum_shifts.append(0)
 
@@ -126,6 +134,6 @@ if uploaded_file:
     fig2.update_layout(barmode='stack', xaxis_title="Month", yaxis_title="Cost ($)")
     st.plotly_chart(fig2, use_container_width=True)
 
-    st.success("✅ Graphs updated with cleaned slider groups, extended ranges, and accurate logic.")
+    st.success("✅ Graphs updated with Locum days per provider logic included.")
 else:
     st.info("Please upload an Excel file to get started.")
