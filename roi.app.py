@@ -30,9 +30,42 @@ if uploaded_file:
 
     st.sidebar.header("🔧 Adjust Model Inputs")
     input_values = {}
-    for item in editable_values:
-        label = f"{item['description']} ({item['cell']})"
-        input_values[label] = st.sidebar.slider(label, min_value=0, max_value=int(item['value'] * 2), value=int(item['value']))
+
+    with st.sidebar.expander("📌 Permanent Staffing Inputs"):
+        for item in editable_values:
+            if 'Provider' in item['description'] or 'Days per provider' in item['description']:
+                label = f"{item['description']} ({item['cell']})"
+                input_values[label] = st.slider(
+                    label,
+                    min_value=0,
+                    max_value=int(item['value'] * 2),
+                    value=int(item['value']),
+                    help="Controls permanent staffing ramp-up and shift volume."
+                )
+
+    with st.sidebar.expander("📌 Float Pool Inputs"):
+        for item in editable_values:
+            if 'Float' in item['description'] or 'Open Days' in item['description']:
+                label = f"{item['description']} ({item['cell']})"
+                input_values[label] = st.slider(
+                    label,
+                    min_value=0,
+                    max_value=int(item['value'] * 2),
+                    value=int(item['value']),
+                    help="Impacts float pool shift volume and cost savings."
+                )
+
+    with st.sidebar.expander("📌 VISTA Locums Inputs"):
+        for item in editable_values:
+            if 'Hospitalist' in item['description']:
+                label = f"{item['description']} ({item['cell']})"
+                input_values[label] = st.slider(
+                    label,
+                    min_value=0,
+                    max_value=int(item['value'] * 2),
+                    value=int(item['value']),
+                    help="Affects VISTA Locum shifts and locum cost per month."
+                )
 
     months = list(range(1, 25))
 
@@ -57,20 +90,14 @@ if uploaded_file:
     st.subheader("📈 Shift Coverage Over 24 Months")
     fig1 = go.Figure()
     for cat in ['Permanent', 'Float Pool', 'VISTA Locums']:
-        fig1.add_trace(go.Bar(x=months, y=shifts_data[cat], name=cat))
+        fig1.add_trace(go.Bar(x=months, y=shifts_data[cat], name=cat, hovertemplate=f"%{{x}} Month<br>%{{y}} Shifts"))
     fig1.update_layout(barmode='stack', xaxis_title="Month", yaxis_title="Shifts")
-
     st.plotly_chart(fig1, use_container_width=True)
 
     st.subheader("💰 Staffing Costs & Savings Over 24 Months")
     fig2 = go.Figure()
     for cat in ['Permanent', 'Float Pool', 'VISTA Locums']:
-        fig2.add_trace(go.Bar(x=months, y=cost_data[cat], name=cat))
-
-    for month in months:
-        total_cost = sum(cost_data[cat][month - 1] for cat in ['Permanent', 'Float Pool', 'VISTA Locums'])
-        savings = baseline_cost - total_cost
-        fig2.add_annotation(x=month, y=0, text=f"Save: ${savings:,.0f}", showarrow=False, yshift=-15, font=dict(size=10))
+        fig2.add_trace(go.Bar(x=months, y=cost_data[cat], name=cat, hovertemplate=f"%{{x}} Month<br>$%{{y:,.0f}} Cost"))
 
     fig2.update_layout(barmode='stack', xaxis_title="Month", yaxis_title="Cost ($)")
     st.plotly_chart(fig2, use_container_width=True)
