@@ -114,9 +114,11 @@ if uploaded_file:
             float_pool_shifts.append(0)
 
     locum_shifts = []
-    for month in months:
+    for idx, month in enumerate(months):
         if month >= 4:
-            locum_shifts.append(min(locum_open_days * locum_days_per_provider, max_monthly_shifts))
+            projected_coverage = permanent_shifts[idx] + float_pool_shifts[idx]
+            locum_demand = max(max_monthly_shifts - projected_coverage, 0)
+            locum_shifts.append(min(locum_demand, locum_open_days * locum_days_per_provider))
         else:
             locum_shifts.append(0)
 
