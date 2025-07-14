@@ -91,7 +91,7 @@ if uploaded_file:
     locum_days_per_provider = input_values.get('Average Days per Locum per Month', 0)
 
     permanent_shifts = []
-max_monthly_shifts = st.sidebar.slider(
+    max_monthly_shifts = st.sidebar.slider(
     "Maximum Monthly Shifts (System Cap)",
     min_value=500,
     max_value=5000,
