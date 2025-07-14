@@ -185,7 +185,6 @@ if uploaded_file:
     else:
         st.error(f"⚠️ **Over Baseline by:** ${abs(total_savings):,.0f}")
 
-    ".replace("
 with tab2:
         st.subheader("🧮 Shift-Based ROI Calculator")
         st.markdown("Upload your Excel file with ICU Bed Loss data to calculate shift-based ROI.")
