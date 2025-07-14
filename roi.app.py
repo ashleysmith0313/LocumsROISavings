@@ -183,4 +183,4 @@ if uploaded_file:
         st.error(f"⚠️ **Over Baseline by:** ${abs(total_savings):,.0f}")
 
     else:
-    st.info("Please upload an Excel file to get started.")
+        st.info("Please upload an Excel file to get started.")
