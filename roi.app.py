@@ -36,8 +36,7 @@ if uploaded_file:
         for item in editable_values:
             if item['cell'] in ['B21', 'B22', 'C17']:
                 label = f"{item['description']} ({item['cell']})"
-                input_values[label] = st.slider(
-                    
+                input_values[item['cell']] = st.slider(
                     label,
                     key=f"{item['cell']}_{label}",
                     min_value=0,
@@ -50,7 +49,7 @@ if uploaded_file:
         for item in editable_values:
             if item['cell'] in ['C17', 'B27', 'B26']:
                 label = f"{item['description']} ({item['cell']})"
-                input_values[label] = st.slider(
+                input_values[item['cell']] = st.slider(
                     label,
                     min_value=0,
                     max_value=int(item['value'] * 4),
@@ -80,14 +79,14 @@ if uploaded_file:
 
     months = list(range(1, 25))
 
-    permanent_onboard_rate = input_values.get('Providers Onboarded per Month (B21)', 0)
-    permanent_days_per_provider = input_values.get('Average Days per provider per Month (B22)', 0)
-    permanent_open_days = input_values.get('Open Days per Month (C17)', 0)
-    float_pool_onboard_rate = input_values.get('Providers Onboarded per Month (B26)', 0)
-    float_pool_open_days = input_values.get('Open Days per Month (C17)', 0)
-    float_pool_days_per_provider = input_values.get('Average Days per provider per Month (B27)', 0)
-    locum_open_days = input_values.get('Open Days per Month (D17)', 0)
-    hospitalist_rate = input_values.get('Hospitalist (B4)', 0)
+    permanent_onboard_rate = input_values.get('B21', 0)
+    permanent_days_per_provider = input_values.get('B22', 0)
+    permanent_open_days = input_values.get('C17', 0)
+    float_pool_onboard_rate = input_values.get('B26', 0)
+    float_pool_open_days = input_values.get('C17', 0)
+    float_pool_days_per_provider = input_values.get('B27', 0)
+    locum_open_days = input_values.get('D17', 0)
+    hospitalist_rate = input_values.get('B4', 0)
     locum_days_per_provider = input_values.get('Average Days per Locum per Month', 0)
 
     permanent_shifts = []
