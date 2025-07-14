@@ -176,7 +176,7 @@ if uploaded_file:
     st.info(f"🏥 **Permanent Cost:** ${sum(cost_data['Permanent']):,.0f}")
     st.info(f"🧑‍⚕️ **Float Pool Cost:** ${sum(cost_data['Float Pool']):,.0f}")
     st.info(f"🩺 **VISTA Locums Cost:** ${sum(cost_data['VISTA Locums']):,.0f}")
-        if total_savings >= 0:
+    if total_savings >= 0:
         st.success(f"🎯 **Total Savings vs Baseline:** ${total_savings:,.0f}")
     else:
         st.error(f"⚠️ **Over Baseline by:** ${abs(total_savings):,.0f}")
