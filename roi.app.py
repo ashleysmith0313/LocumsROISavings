@@ -12,7 +12,7 @@ st.markdown("This tool allows you to visualize staffing deployment assumptions a
 uploaded_file = st.file_uploader("Upload your Excel File", type=["xlsx"])
 
 if uploaded_file:
-                    wb = load_workbook(uploaded_file, data_only=True)
+    wb = load_workbook(uploaded_file, data_only=True)
     sheet = wb['Combo- Select & Float Pool']
 
     editable_values = []
