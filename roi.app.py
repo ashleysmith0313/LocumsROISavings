@@ -118,7 +118,8 @@ if uploaded_file:
         if month >= 4:
             projected_coverage = permanent_shifts[idx] + float_pool_shifts[idx]
             locum_demand = max(max_monthly_shifts - projected_coverage, 0)
-            locum_shifts.append(min(locum_demand, locum_open_days * locum_days_per_provider))
+            decay_factor = max(locum_demand / max_monthly_shifts, 0)
+            locum_shifts.append(int(locum_open_days * locum_days_per_provider * decay_factor))
         else:
             locum_shifts.append(0)
 
