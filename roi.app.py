@@ -91,25 +91,33 @@ if uploaded_file:
     locum_days_per_provider = input_values.get('Average Days per Locum per Month', 0)
 
     permanent_shifts = []
+max_monthly_shifts = st.sidebar.slider(
+    "Maximum Monthly Shifts (System Cap)",
+    min_value=500,
+    max_value=5000,
+    value=1960,
+    step=100,
+    key='Max_Shift_Cap_Slider'
+)
     total_permanent = 0
     for month in months:
         if month >= 4:
             total_permanent += permanent_onboard_rate
-        permanent_shifts.append(total_permanent * permanent_days_per_provider * permanent_open_days)
+        permanent_shifts.append(min(total_permanent * permanent_days_per_provider, max_monthly_shifts))
 
     float_pool_shifts = []
     total_float_pool = 0
     for month in months:
         if month >= 12:
             total_float_pool += float_pool_onboard_rate
-            float_pool_shifts.append(total_float_pool * float_pool_days_per_provider)
+            float_pool_shifts.append(min(total_float_pool * float_pool_days_per_provider, max_monthly_shifts))
         else:
             float_pool_shifts.append(0)
 
     locum_shifts = []
     for month in months:
         if month >= 4:
-            locum_shifts.append(locum_open_days * locum_days_per_provider)
+            locum_shifts.append(min(locum_open_days * locum_days_per_provider, max_monthly_shifts))
         else:
             locum_shifts.append(0)
 
