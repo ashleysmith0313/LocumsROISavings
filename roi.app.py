@@ -34,7 +34,7 @@ if uploaded_file:
     with st.sidebar.expander("📌 Permanent Staffing Inputs"):
         st.markdown("**Permanent staffing ramp-up assumptions.**")
         for item in editable_values:
-            if item['cell'] in ['B21', 'B22']:
+            if item['cell'] in ['B21', 'B22', 'C17']:
                 label = f"{item['description']} ({item['cell']})"
                 input_values[label] = st.slider(
                     label,
@@ -78,6 +78,7 @@ if uploaded_file:
 
     permanent_onboard_rate = input_values.get('Providers Onboarded per Month (B21)', 0)
     permanent_days_per_provider = input_values.get('Average Days per provider per Month (B22)', 0)
+    permanent_open_days = input_values.get('Open Days per Month (C17)', 0)
     float_pool_onboard_rate = input_values.get('Providers Onboarded per Month (B26)', 0)
     float_pool_open_days = input_values.get('Open Days per Month (C17)', 0)
     float_pool_days_per_provider = input_values.get('Average Days per provider per Month (B27)', 0)
@@ -90,7 +91,7 @@ if uploaded_file:
     for month in months:
         if month >= 4:
             total_permanent += permanent_onboard_rate
-        permanent_shifts.append(total_permanent * permanent_days_per_provider)
+        permanent_shifts.append(total_permanent * permanent_days_per_provider * permanent_open_days)
 
     float_pool_shifts = []
     total_float_pool = 0
@@ -125,7 +126,7 @@ if uploaded_file:
         for i in range(len(months))
     ]
 
-    baseline_monthly_cost = 500000  # Example baseline monthly cost for comparison
+    baseline_monthly_cost = st.sidebar.slider("Baseline Monthly Cost", min_value=100000, max_value=2000000, value=500000, step=50000)
     total_baseline_cost = baseline_monthly_cost * len(months)
     total_actual_cost = sum(total_cost_per_month)
     total_savings = total_baseline_cost - total_actual_cost
@@ -146,7 +147,10 @@ if uploaded_file:
     st.plotly_chart(fig2, use_container_width=True)
 
     st.info(f"💰 **Total Cost Over 24 Months:** ${total_actual_cost:,.0f}")
-    st.success(f"🎯 **Total Savings vs Baseline:** ${total_savings:,.0f}")
+    if total_savings >= 0:
+        st.success(f"🎯 **Total Savings vs Baseline:** ${total_savings:,.0f}")
+    else:
+        st.error(f"⚠️ **Over Baseline by:** ${abs(total_savings):,.0f}")
 
 else:
     st.info("Please upload an Excel file to get started.")
