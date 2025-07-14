@@ -185,7 +185,7 @@ if uploaded_file:
     else:
         st.error(f"⚠️ **Over Baseline by:** ${abs(total_savings):,.0f}")
 
-with tab2:
+    with tab2:
         st.subheader("🧮 Shift-Based ROI Calculator")
         st.markdown("Upload your Excel file with ICU Bed Loss data to calculate shift-based ROI.")
 
@@ -216,8 +216,7 @@ with tab2:
             st.metric("Total ICU Revenue Loss", f"${df['Total_ICU_Loss'].sum():,.0f}")
             st.metric("Total Combined Impact", f"${df['Total_Impact'].sum():,.0f}")
 
-        else:
-            st.info("Please upload an ICU Bed Loss Excel file to use this calculator.")
+        
 
 else:
     st.info("Please upload an Excel file to get started.")
