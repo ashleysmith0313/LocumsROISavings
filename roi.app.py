@@ -37,7 +37,9 @@ if uploaded_file:
             if item['cell'] in ['B21', 'B22', 'C17']:
                 label = f"{item['description']} ({item['cell']})"
                 input_values[label] = st.slider(
+                    
                     label,
+                    key=f"{item['cell']}_{label}",
                     min_value=0,
                     max_value=int(item['value'] * 4),
                     value=int(item['value'])
@@ -67,11 +69,13 @@ if uploaded_file:
                     value=int(item['value'])
                 )
         locum_days_per_provider = st.slider(
+        
             "Average Days per Locum per Month (Manual Entry)",
             min_value=0,
             max_value=240,
-            value=20
-        )
+            value=20,
+        key='Locum_Days_Slider'
+    )
         input_values["Average Days per Locum per Month"] = locum_days_per_provider
 
     months = list(range(1, 25))
@@ -126,7 +130,10 @@ if uploaded_file:
         for i in range(len(months))
     ]
 
-    baseline_monthly_cost = st.sidebar.slider("Baseline Monthly Cost", min_value=100000, max_value=2000000, value=500000, step=50000)
+    baseline_monthly_cost = st.sidebar.slider(
+    "Baseline Monthly Cost", min_value=100000, max_value=2000000, value=500000, step=50000,
+    key='Baseline_Cost_Slider'
+)
     total_baseline_cost = baseline_monthly_cost * len(months)
     total_actual_cost = sum(total_cost_per_month)
     total_savings = total_baseline_cost - total_actual_cost
