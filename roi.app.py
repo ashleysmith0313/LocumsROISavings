@@ -12,9 +12,6 @@ st.markdown("This tool allows you to visualize staffing deployment assumptions a
 uploaded_file = st.file_uploader("Upload your Excel File", type=["xlsx"])
 
 if uploaded_file:
-    tab1, tab2 = st.tabs(["Deployment Visualizer", "Shift-Based ROI Calculator"])
-
-    with tab1:
                     wb = load_workbook(uploaded_file, data_only=True)
     sheet = wb['Combo- Select & Float Pool']
 
@@ -185,38 +182,5 @@ if uploaded_file:
     else:
         st.error(f"⚠️ **Over Baseline by:** ${abs(total_savings):,.0f}")
 
-    with tab2:
-        st.subheader("🧮 Shift-Based ROI Calculator")
-        st.markdown("Upload your Excel file with ICU Bed Loss data to calculate shift-based ROI.")
-
-        uploaded_file_icu = st.file_uploader("Upload ICU Bed Loss Excel File", type=["xlsx"], key='ICU_File')
-
-        if uploaded_file_icu is not None:
-            df = pd.read_excel(uploaded_file_icu)
-
-            st.sidebar.subheader("Adjust ICU Bed Loss Model Inputs")
-            st.sidebar.markdown("---")
-            locum_shift_cost = st.sidebar.number_input("Locum Shift Cost ($)", min_value=0, value=2000, step=100)
-            icu_day_loss = st.sidebar.number_input("ICU Revenue Loss per Day ($)", min_value=0, value=10000, step=500)
-
-            df['Total_Locum_Cost'] = df['Locum Shifts'] * locum_shift_cost
-            df['Total_ICU_Loss'] = df['ICU Bed Loss Days'] * icu_day_loss
-            df['Total_Impact'] = df['Total_Locum_Cost'] + df['Total_ICU_Loss']
-
-            st.subheader("📊 ICU Bed Loss Impact Analysis")
-
-            fig = go.Figure()
-            fig.add_trace(go.Bar(x=df['Month'], y=df['Total_Locum_Cost'], name='Total Locum Cost'))
-            fig.add_trace(go.Bar(x=df['Month'], y=df['Total_ICU_Loss'], name='Total ICU Revenue Loss'))
-            fig.update_layout(barmode='stack', xaxis_title='Month', yaxis_title='Total Impact ($)')
-            st.plotly_chart(fig, use_container_width=True)
-
-            st.subheader("💰 Total Financial Impact")
-            st.metric("Total Locum Cost", f"${df['Total_Locum_Cost'].sum():,.0f}")
-            st.metric("Total ICU Revenue Loss", f"${df['Total_ICU_Loss'].sum():,.0f}")
-            st.metric("Total Combined Impact", f"${df['Total_Impact'].sum():,.0f}")
-
-        
-
-else:
+    else:
     st.info("Please upload an Excel file to get started.")
