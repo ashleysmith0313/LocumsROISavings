@@ -15,7 +15,7 @@ if uploaded_file:
     tab1, tab2 = st.tabs(["Deployment Visualizer", "Shift-Based ROI Calculator"])
 
     with tab1:
-    wb = load_workbook(uploaded_file, data_only=True)
+                    wb = load_workbook(uploaded_file, data_only=True)
     sheet = wb['Combo- Select & Float Pool']
 
     editable_values = []
@@ -185,7 +185,8 @@ if uploaded_file:
     else:
         st.error(f"⚠️ **Over Baseline by:** ${abs(total_savings):,.0f}")
 
-    with tab2:
+    ".replace("
+with tab2:
         st.subheader("🧮 Shift-Based ROI Calculator")
         st.markdown("Upload your Excel file with ICU Bed Loss data to calculate shift-based ROI.")
 
