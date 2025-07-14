@@ -162,6 +162,9 @@ if uploaded_file:
     st.plotly_chart(fig2, use_container_width=True)
 
     st.info(f"💰 **Total Cost Over 24 Months:** ${total_actual_cost:,.0f}")
+    st.info(f"🏥 **Permanent Cost:** ${sum(cost_data['Permanent']):,.0f}")
+    st.info(f"🧑‍⚕️ **Float Pool Cost:** ${sum(cost_data['Float Pool']):,.0f}")
+    st.info(f"🩺 **VISTA Locums Cost:** ${sum(cost_data['VISTA Locums']):,.0f}")
     if total_savings >= 0:
         st.success(f"🎯 **Total Savings vs Baseline:** ${total_savings:,.0f}")
     else:
