@@ -148,6 +148,9 @@ if uploaded_file:
     total_actual_cost = sum(total_cost_per_month)
     total_savings = total_baseline_cost - total_actual_cost
 
+    locum_providers = [int(shifts / locum_days_per_provider) if locum_days_per_provider > 0 else 0 for shifts in locum_shifts]
+    total_locum_providers = sum(locum_providers)
+
     st.subheader("📈 Shift Coverage Over 24 Months")
     fig1 = go.Figure()
     for cat in ['Permanent', 'Float Pool', 'VISTA Locums']:
@@ -163,10 +166,17 @@ if uploaded_file:
     fig2.update_layout(barmode='stack', xaxis_title="Month", yaxis_title="Cost ($)")
     st.plotly_chart(fig2, use_container_width=True)
 
+    st.subheader("👨‍⚕️ Locum Providers Per Month")
+    fig3 = go.Figure()
+    fig3.add_trace(go.Scatter(x=months, y=locum_providers, mode='lines+markers', name='Locum Providers'))
+    fig3.update_layout(xaxis_title="Month", yaxis_title="Locum Providers")
+    st.plotly_chart(fig3, use_container_width=True)
+
     st.info(f"💰 **Total Cost Over 24 Months:** ${total_actual_cost:,.0f}")
     st.info(f"🏥 **Permanent Cost:** ${sum(cost_data['Permanent']):,.0f}")
     st.info(f"🧑‍⚕️ **Float Pool Cost:** ${sum(cost_data['Float Pool']):,.0f}")
     st.info(f"🩺 **VISTA Locums Cost:** ${sum(cost_data['VISTA Locums']):,.0f}")
+    st.info(f"👨‍⚕️ **Total Locum Providers Used Over 24 Months:** {total_locum_providers:,}")
     if total_savings >= 0:
         st.success(f"🎯 **Total Savings vs Baseline:** ${total_savings:,.0f}")
     else:
