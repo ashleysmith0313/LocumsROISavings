@@ -61,7 +61,7 @@ if uploaded_file:
         for item in editable_values:
             if item['cell'] in ['D17', 'B4']:
                 label = f"{item['description']} ({item['cell']})"
-                input_values[label] = st.slider(
+                input_values[item['cell']] = st.slider(
                     label,
                     min_value=0,
                     max_value=int(item['value'] * 4),
